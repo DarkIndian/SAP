@@ -37,10 +37,16 @@ Transparent table holding default parameter values.  See `src/ddic/ZTOVERDRAFT_C
 | `Z_BPAREA` | Bank Posting Area (optional restriction) |
 
 ### Message Class: `ZOVERDRAFT`
-| No. | Text |
-|---|---|
-| 001 | User &1 not authorised for bank posting area &2 |
-| 002 | Cross-dependency validation failed. Check parameters. |
+| No. | Severity | Text |
+|---|---|---|
+| 001 | E | You are not authorized to run this job for bank posting area &2 (User: &1) |
+| 010 | E | Overdraft since date &1 must not be in the future |
+| 011 | E | Key date &1 must not be before overdraft since date &2 |
+| 012 | E | Limit type &1 is invalid – use NOLIMIT, EXTLIMIT, or INTLIMIT |
+| 013 | E | Bank posting area &1 does not exist |
+| 020 | E | Minimum overdraft amount is required when currency is specified |
+| 021 | E | Currency is required when minimum overdraft amount is specified |
+| 022 | E | External account number, region, and bank key must all be provided together |
 
 ---
 
@@ -77,24 +83,32 @@ Transparent table holding default parameter values.  See `src/ddic/ZTOVERDRAFT_C
 
 ---
 
-## Execution Flow
+## Classical Report – Selection Screen Event Model
+
+| Event | Trigger | Action |
+|---|---|---|
+| `INITIALIZATION` | Program load / variant apply | Fill blank parameters from `ZTOVERDRAFT_CONFIG` |
+| `AT SELECTION-SCREEN ON p_odsince` | Field exit | Overdraft-since date must not be in the future |
+| `AT SELECTION-SCREEN ON p_keydt` | Field exit | Key date must not precede overdraft-since date |
+| `AT SELECTION-SCREEN ON p_bparea` | Field exit | Bank posting area existence check |
+| `AT SELECTION-SCREEN ON p_limtype` | Field exit | Limit type value must match domain `ZDE_LIMIT_TYPE` |
+| `AT SELECTION-SCREEN` | F8 Execute | Authorization check + cross-field Rules I & II |
+| `START-OF-SELECTION` | After all checks pass | CDS call → spool output → Application Log save |
+
+`MESSAGE e...` in selection screen events redisplays the screen with the error at the bottom; the job cannot proceed until all checks pass. In background mode the same MESSAGE terminates the job and writes to the job log.
+
+## Execution Flow (START-OF-SELECTION only)
 
 ```
-START
+START-OF-SELECTION  ← reached only after all screen events pass
   │
-  ├─ Fill blanks from ZTOVERDRAFT_CONFIG (user values take precedence)
-  │
-  ├─ Authorization Check (Z_OD_JOB / ACTVT=16)
-  │     └─ FAIL → log error + STOP
-  │
-  ├─ Cross-Dependency Validation (Rules I & II)
-  │     └─ FAIL → log error + STOP
+  ├─ Initialize Application Log (ZOVERDRAFT / BATCH)
   │
   ├─ SELECT from CDS View ZCDS_OVERDRAFT_ITEMS
   │     ├─ Returns data  → write to spool (if P_SPOOL = 'X')
   │     └─ No data       → log warning, no spool output
   │
-  └─ Save Application Log (ZOVERDRAFT / BATCH)
+  └─ Save Application Log → view via SLG1
 END
 ```
 
