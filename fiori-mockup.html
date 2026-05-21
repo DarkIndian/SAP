@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>SC Mass Upload — Fiori Mockup</title>
+<style>
+  /* ── SAP Fiori Horizon palette ─────────────────────────────────────── */
+  :root {
+    --shell-bg:       #1d2d3e;
+    --shell-fg:       #ffffff;
+    --page-bg:        #f5f6f7;
+    --card-bg:        #ffffff;
+    --border:         #d9d9d9;
+    --border-strong:  #8c8c8c;
+    --accent:         #0064d9;
+    --accent-hover:   #0854b0;
+    --text-primary:   #1d2d3e;
+    --text-secondary: #556b82;
+    --green:          #256f3a;
+    --green-bg:       #e8f5e9;
+    --red:            #aa0808;
+    --red-bg:         #fce8e8;
+    --orange:         #c35500;
+    --orange-bg:      #fff3e0;
+    --grey-bg:        #f0f1f2;
+    --toolbar-bg:     #ffffff;
+    --header-bg:      #ffffff;
+    --row-hover:      #eaf0fb;
+    --selected-row:   #d6e7ff;
+    --tag-green:      #256f3a;
+    --tag-red:        #aa0808;
+    --tag-orange:     #c35500;
+    --tag-grey:       #556b82;
+    --radius:         8px;
+    --radius-sm:      4px;
+    --shadow:         0 2px 8px rgba(0,0,0,.10);
+    --shadow-lg:      0 4px 20px rgba(0,0,0,.13);
+    --font:           'Segoe UI', '72', Arial, sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font); font-size: 14px; background: var(--page-bg); color: var(--text-primary); }
+
+  /* ── Shell Bar ─────────────────────────────────────────────────────── */
+  .shell { background: var(--shell-bg); color: var(--shell-fg); display: flex; align-items: center; height: 44px; padding: 0 16px; gap: 16px; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,.25); }
+  .shell-logo { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 700; letter-spacing: .5px; }
+  .shell-logo svg { width: 28px; height: 18px; }
+  .shell-sep { width: 1px; height: 22px; background: rgba(255,255,255,.25); }
+  .shell-app { font-size: 14px; font-weight: 600; color: rgba(255,255,255,.92); }
+  .shell-spacer { flex: 1; }
+  .shell-avatar { width: 30px; height: 30px; border-radius: 50%; background: #4a90d9; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12px; cursor: pointer; }
+
+  /* ── Page tabs (List Report / Object Page toggle) ────────────────────*/
+  .nav-tabs { background: #fff; border-bottom: 1px solid var(--border); display: flex; padding: 0 16px; gap: 0; }
+  .nav-tab { padding: 10px 20px; font-size: 13px; font-weight: 500; color: var(--text-secondary); cursor: pointer; border-bottom: 3px solid transparent; white-space: nowrap; transition: color .15s, border-color .15s; }
+  .nav-tab.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+  .nav-tab:hover:not(.active) { color: var(--text-primary); background: var(--grey-bg); }
+
+  /* ── Page wrapper ───────────────────────────────────────────────────── */
+  .page { display: none; padding: 16px; max-width: 1400px; margin: 0 auto; }
+  .page.active { display: block; }
+
+  /* ── Dynamic Page Title ──────────────────────────────────────────────*/
+  .dpt { background: var(--card-bg); border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 12px; overflow: hidden; }
+  .dpt-title-bar { padding: 16px 20px 10px; border-bottom: 1px solid var(--border); display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; }
+  .dpt-h1 { font-size: 22px; font-weight: 700; color: var(--text-primary); }
+  .dpt-subtitle { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
+  .dpt-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+  /* ── Filter Bar ─────────────────────────────────────────────────────*/
+  .filter-bar { padding: 12px 20px; display: flex; align-items: center; gap: 12px; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+  .filter-label { font-size: 12px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .5px; white-space: nowrap; }
+  .filter-chip { display: flex; align-items: center; gap: 6px; background: var(--grey-bg); border: 1px solid var(--border); border-radius: 16px; padding: 4px 12px; font-size: 12px; color: var(--text-primary); cursor: pointer; }
+  .filter-chip:hover { border-color: var(--accent); color: var(--accent); }
+  .filter-chip.active { background: #eaf0fb; border-color: var(--accent); color: var(--accent); }
+  .filter-go { margin-left: auto; }
+
+  /* ── Buttons ────────────────────────────────────────────────────────*/
+  .btn { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; cursor: pointer; border: 1px solid; transition: background .15s, box-shadow .15s; white-space: nowrap; }
+  .btn-primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .btn-primary:hover { background: var(--accent-hover); border-color: var(--accent-hover); box-shadow: 0 2px 6px rgba(0,100,217,.30); }
+  .btn-default { background: #fff; color: var(--text-primary); border-color: var(--border-strong); }
+  .btn-default:hover { background: var(--grey-bg); }
+  .btn-ghost { background: transparent; color: var(--accent); border-color: transparent; }
+  .btn-ghost:hover { background: var(--row-hover); }
+  .btn-icon { padding: 7px 9px; }
+  .btn-sm { padding: 5px 10px; font-size: 12px; }
+
+  /* ── Table ──────────────────────────────────────────────────────────*/
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead tr { background: var(--grey-bg); border-bottom: 2px solid var(--border); }
+  thead th { padding: 10px 14px; text-align: left; font-weight: 600; font-size: 12px; color: var(--text-secondary); white-space: nowrap; cursor: pointer; user-select: none; }
+  thead th:hover { color: var(--accent); }
+  thead th .sort-icon { opacity: .4; font-size: 10px; }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background .1s; }
+  tbody tr:hover { background: var(--row-hover); }
+  tbody tr.selected { background: var(--selected-row); }
+  tbody td { padding: 9px 14px; color: var(--text-primary); vertical-align: middle; white-space: nowrap; }
+  tbody td.link { color: var(--accent); cursor: pointer; font-weight: 500; }
+  tbody td.link:hover { text-decoration: underline; }
+  .table-footer { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border-top: 1px solid var(--border); font-size: 12px; color: var(--text-secondary); }
+  .pagination { display: flex; align-items: center; gap: 4px; }
+  .pg-btn { width: 28px; height: 28px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; color: var(--text-secondary); }
+  .pg-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .pg-btn:hover:not(.active) { background: var(--grey-bg); }
+
+  /* ── Status badges ──────────────────────────────────────────────────*/
+  .badge { display: inline-flex; align-items: center; gap: 5px; border-radius: 12px; padding: 3px 10px; font-size: 12px; font-weight: 600; }
+  .badge-green  { background: var(--green-bg);  color: var(--green);  }
+  .badge-red    { background: var(--red-bg);    color: var(--red);    }
+  .badge-orange { background: var(--orange-bg); color: var(--orange); }
+  .badge-grey   { background: var(--grey-bg);   color: var(--tag-grey); }
+  .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .dot-green  { background: var(--green); }
+  .dot-red    { background: var(--red); }
+  .dot-orange { background: var(--orange); }
+  .dot-grey   { background: var(--tag-grey); }
+  /* icon-based criticality */
+  .icon-crit { font-size: 15px; }
+
+  /* ── Card / Section ─────────────────────────────────────────────────*/
+  .card { background: var(--card-bg); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; margin-bottom: 16px; }
+  .card-header { padding: 13px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; background: var(--card-bg); }
+  .card-title { font-size: 15px; font-weight: 700; color: var(--text-primary); }
+  .card-count { font-size: 12px; color: var(--text-secondary); font-weight: 400; margin-left: 8px; }
+
+  /* ── Object Page ────────────────────────────────────────────────────*/
+  .obj-header { background: linear-gradient(135deg, #1d2d3e 0%, #1a4570 100%); color: #fff; padding: 20px 24px; border-radius: var(--radius); margin-bottom: 14px; display: flex; align-items: flex-start; gap: 20px; }
+  .obj-header-icon { width: 52px; height: 52px; border-radius: var(--radius); background: rgba(255,255,255,.15); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+  .obj-header-text { flex: 1; }
+  .obj-h1 { font-size: 20px; font-weight: 700; margin-bottom: 3px; }
+  .obj-desc { font-size: 13px; opacity: .80; display: flex; align-items: center; gap: 8px; }
+  .obj-header-kpis { display: flex; gap: 20px; margin-top: 14px; flex-wrap: wrap; }
+  .kpi { text-align: center; }
+  .kpi-val { font-size: 22px; font-weight: 700; line-height: 1; }
+  .kpi-lbl { font-size: 11px; opacity: .75; margin-top: 2px; text-transform: uppercase; letter-spacing: .4px; }
+  .kpi-green  { color: #7fffa1; }
+  .kpi-red    { color: #ff9f9f; }
+  .kpi-blue   { color: #9ecfff; }
+  .obj-header-actions { display: flex; gap: 8px; flex-shrink: 0; flex-direction: column; align-items: flex-end; }
+
+  /* ── Form fields ─────────────────────────────────────────────────────*/
+  .form-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px 24px; padding: 18px 20px; }
+  .form-field { display: flex; flex-direction: column; gap: 3px; }
+  .form-label { font-size: 11px; font-weight: 600; color: var(--text-secondary); text-transform: uppercase; letter-spacing: .4px; }
+  .form-value { font-size: 14px; color: var(--text-primary); padding: 4px 0; border-bottom: 1px solid transparent; }
+  .form-value.link { color: var(--accent); cursor: pointer; }
+  .form-value.link:hover { text-decoration: underline; }
+
+  /* ── Breadcrumb ──────────────────────────────────────────────────────*/
+  .breadcrumb { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-secondary); margin-bottom: 14px; }
+  .breadcrumb a { color: var(--accent); cursor: pointer; text-decoration: none; }
+  .breadcrumb a:hover { text-decoration: underline; }
+  .breadcrumb span { opacity: .5; }
+
+  /* ── Modal overlay ───────────────────────────────────────────────────*/
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.50); z-index: 200; display: none; align-items: center; justify-content: center; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: #fff; border-radius: var(--radius); box-shadow: var(--shadow-lg); width: 480px; max-width: 95vw; overflow: hidden; }
+  .modal-header { background: var(--shell-bg); color: #fff; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; }
+  .modal-title { font-size: 15px; font-weight: 700; }
+  .modal-close { background: none; border: none; color: #fff; font-size: 18px; cursor: pointer; padding: 0 4px; }
+  .modal-body { padding: 20px; }
+  .modal-footer { padding: 14px 20px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 8px; background: var(--grey-bg); }
+  .input-group { margin-bottom: 16px; }
+  .input-label { display: block; font-size: 12px; font-weight: 600; color: var(--text-secondary); margin-bottom: 5px; text-transform: uppercase; letter-spacing: .4px; }
+  .input-label .req { color: var(--red); }
+  .input-field { width: 100%; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); padding: 8px 10px; font-size: 14px; font-family: var(--font); color: var(--text-primary); outline: none; transition: border-color .15s, box-shadow .15s; }
+  .input-field:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,100,217,.12); }
+  .upload-zone { border: 2px dashed var(--border-strong); border-radius: var(--radius); padding: 28px; text-align: center; background: var(--grey-bg); cursor: pointer; transition: border-color .15s, background .15s; }
+  .upload-zone:hover { border-color: var(--accent); background: #eaf0fb; }
+  .upload-zone .uz-icon { font-size: 32px; margin-bottom: 10px; }
+  .upload-zone .uz-text { font-size: 14px; font-weight: 500; color: var(--text-primary); }
+  .upload-zone .uz-hint { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
+  .file-attached { background: var(--green-bg); border: 1px solid #a5d6a7; border-radius: var(--radius-sm); padding: 10px 14px; display: flex; align-items: center; gap: 10px; font-size: 13px; }
+  .toast { position: fixed; bottom: 24px; right: 24px; background: var(--shell-bg); color: #fff; border-radius: var(--radius); padding: 14px 20px; font-size: 13px; font-weight: 500; box-shadow: var(--shadow-lg); display: flex; align-items: center; gap: 10px; z-index: 300; transform: translateY(80px); opacity: 0; transition: transform .3s, opacity .3s; }
+  .toast.show { transform: translateY(0); opacity: 1; }
+  .toast.success { border-left: 4px solid #4caf50; }
+  .toast.error   { border-left: 4px solid var(--red); }
+  .progress-bar { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; margin-top: 8px; }
+  .progress-fill { height: 100%; background: var(--accent); border-radius: 2px; transition: width 1s linear; }
+
+  /* ── Checkbox ────────────────────────────────────────────────────────*/
+  .cb-wrap { display: flex; align-items: center; gap: 6px; }
+  input[type=checkbox] { width: 15px; height: 15px; cursor: pointer; accent-color: var(--accent); }
+
+  /* ── Search ─────────────────────────────────────────────────────────*/
+  .search-input { border: 1px solid var(--border-strong); border-radius: 20px; padding: 6px 14px 6px 32px; font-size: 13px; width: 220px; background: var(--grey-bg) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' fill='%23556b82' viewBox='0 0 16 16'%3E%3Cpath d='M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.099zm-5.242 1.856a5.5 5.5 0 1 1 0-11 5.5 5.5 0 0 1 0 11z'/%3E%3C/svg%3E") no-repeat 10px center; outline: none; font-family: var(--font); }
+  .search-input:focus { border-color: var(--accent); background-color: #fff; box-shadow: 0 0 0 3px rgba(0,100,217,.10); }
+
+  /* ── Divider ─────────────────────────────────────────────────────────*/
+  .section-tabs { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 0; padding: 0 20px; background: #fff; }
+  .section-tab { padding: 10px 18px; font-size: 13px; font-weight: 500; cursor: pointer; border-bottom: 3px solid transparent; color: var(--text-secondary); }
+  .section-tab.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+
+  /* ── Responsive tweaks ───────────────────────────────────────────────*/
+  @media (max-width: 768px) {
+    .obj-header { flex-wrap: wrap; }
+    .obj-header-kpis { gap: 14px; }
+    .form-grid { grid-template-columns: 1fr 1fr; }
+    .search-input { width: 160px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════
+     SHELL BAR
+═══════════════════════════════════════════════ -->
+<div class="shell">
+  <div class="shell-logo">
+    <!-- SAP logo -->
+    <svg viewBox="0 0 56 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="56" height="28" rx="3" fill="#0070F2"/>
+      <text x="7" y="20" font-family="Arial" font-weight="bold" font-size="16" fill="white">SAP</text>
+    </svg>
+  </div>
+  <div class="shell-sep"></div>
+  <div class="shell-app">SC Mass Upload</div>
+  <div class="shell-spacer"></div>
+  <div class="shell-avatar">RR</div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     NAV TABS  (simulate routing)
+═══════════════════════════════════════════════ -->
+<div class="nav-tabs">
+  <div class="nav-tab active" id="tab-list" onclick="showPage('list')">📋 List Report — Upload Runs</div>
+  <div class="nav-tab" id="tab-obj"  onclick="showPage('obj')">🗂 Object Page — Run Detail</div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     PAGE 1 : LIST REPORT
+     Source: @UI.lineItem annotations in
+             ZC_SC_UPLOAD_RUN_NHL.ddlx
+═══════════════════════════════════════════════ -->
+<div class="page active" id="page-list">
+
+  <!-- Dynamic Page Title  ← driven by @UI.headerInfo typeNamePlural -->
+  <div class="dpt">
+    <div class="dpt-title-bar">
+      <div>
+        <div class="dpt-h1">Upload Runs</div>
+        <div class="dpt-subtitle">SC Mass Upload / Service Contract Bulk Processing</div>
+      </div>
+      <div class="dpt-actions">
+        <input class="search-input" type="text" placeholder="Search…"/>
+        <button class="btn btn-default btn-icon" title="Filters">⚙ Filters</button>
+        <button class="btn btn-default btn-icon" title="Sort">↕ Sort</button>
+        <button class="btn btn-default btn-icon" title="Group">⊞ Group</button>
+      </div>
+    </div>
+
+    <!-- Filter bar — Status chips -->
+    <div class="filter-bar">
+      <span class="filter-label">Status:</span>
+      <span class="filter-chip active">All (8)</span>
+      <span class="filter-chip">✅ Completed (5)</span>
+      <span class="filter-chip">❌ Failed (2)</span>
+      <span class="filter-chip">⏳ Running (1)</span>
+      <div class="filter-go">
+        <button class="btn btn-primary btn-sm" onclick="showPage('obj')">↗ Adapt Filters</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table card -->
+  <div class="card">
+    <div class="card-header">
+      <div>
+        <span class="card-title">Upload Runs</span>
+        <span class="card-count">(8 items)</span>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <!-- ← THIS IS THE "Upload Excel" BUTTON
+             Source: @UI.lineItem [{ type: #FOR_ACTION, dataAction: 'uploadExcel',
+                                     label: 'Upload Excel', position: 10 }]
+             on field UploadRunUuid in ZC_SC_UPLOAD_RUN_NHL.ddlx
+        -->
+        <button class="btn btn-primary" onclick="openUploadModal()">
+          ⬆ Upload Excel
+        </button>
+        <button class="btn btn-default">↺ Reprocess Failed</button>
+        <button class="btn btn-default btn-icon">⋯</button>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th><input type="checkbox"/></th>
+            <!-- Columns come from @UI.lineItem in ZC_SC_UPLOAD_RUN_NHL.ddlx
+                 pos 10 = Upload Time, 20 = File Name, 30 = Uploaded By,
+                 40 = Total, 50 = Success, 60 = Failed, 70 = Status -->
+            <th>Upload Time <span class="sort-icon">▼</span></th>
+            <th>File Name <span class="sort-icon">⇅</span></th>
+            <th>Uploaded By <span class="sort-icon">⇅</span></th>
+            <th>Total <span class="sort-icon">⇅</span></th>
+            <th>Success <span class="sort-icon">⇅</span></th>
+            <th>Failed <span class="sort-icon">⇅</span></th>
+            <!-- Status col with criticality icon  ← StatusCriticality field drives colour
+                 @UI.lineItem [{ criticality: 'StatusCriticality',
+                                 criticalityRepresentation: #WITH_ICON }] -->
+            <th>Status <span class="sort-icon">⇅</span></th>
+          </tr>
+        </thead>
+        <tbody id="list-body">
+          <!-- rows injected by JS below -->
+        </tbody>
+      </table>
+    </div>
+
+    <div class="table-footer">
+      <span>Showing 1–8 of 8</span>
+      <div class="pagination">
+        <button class="pg-btn">‹</button>
+        <button class="pg-btn active">1</button>
+        <button class="pg-btn">›</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ════════════════════════════════════════════
+     PAGE 2 : OBJECT PAGE  (Run Detail)
+     Source: @UI.facet + @UI.identification in
+             ZC_SC_UPLOAD_RUN_NHL.ddlx  and
+             ZC_SC_UPLOAD_RES_NHL.ddlx
+═══════════════════════════════════════════════ -->
+<div class="page" id="page-obj">
+
+  <!-- Breadcrumb -->
+  <div class="breadcrumb">
+    <a onclick="showPage('list')">Upload Runs</a>
+    <span>›</span>
+    <span>SC_Contracts_Batch_May2025.xlsx</span>
+  </div>
+
+  <!-- Object Header  ← @UI.headerInfo title.value='FileName', description='OverallStatus' -->
+  <div class="obj-header">
+    <div class="obj-header-icon">📄</div>
+    <div class="obj-header-text" style="flex:1">
+      <!-- title.value: 'FileName' -->
+      <div class="obj-h1">SC_Contracts_Batch_May2025.xlsx</div>
+      <!-- description.value: 'OverallStatus' shown with badge -->
+      <div class="obj-desc">
+        <span>Run ID: 550e8400-e29b-41d4-a716-446655440000</span>
+        &nbsp;·&nbsp;
+        <span class="badge badge-green" style="background:rgba(76,175,80,.25);color:#7fffa1">
+          <span class="dot dot-green" style="background:#7fffa1"></span> COMPLETED
+        </span>
+      </div>
+      <!-- KPI bar -->
+      <div class="obj-header-kpis">
+        <div class="kpi"><div class="kpi-val kpi-blue">150</div><div class="kpi-lbl">Total</div></div>
+        <div class="kpi"><div class="kpi-val kpi-green">143</div><div class="kpi-lbl">Success</div></div>
+        <div class="kpi"><div class="kpi-val kpi-red">7</div><div class="kpi-lbl">Failed</div></div>
+        <div class="kpi"><div class="kpi-val" style="color:#9ecfff;font-size:13px">4.2 MB</div><div class="kpi-lbl">File Size</div></div>
+      </div>
+    </div>
+    <div class="obj-header-actions">
+      <!-- Same action as list toolbar — re-run upload -->
+      <button class="btn btn-primary" onclick="openUploadModal()">⬆ Upload Excel</button>
+      <button class="btn btn-default" style="background:rgba(255,255,255,.12);color:#fff;border-color:rgba(255,255,255,.3)">↺ Reprocess Failed</button>
+      <button class="btn btn-default" style="background:rgba(255,255,255,.12);color:#fff;border-color:rgba(255,255,255,.3)">⋯ More</button>
+    </div>
+  </div>
+
+  <!-- Section tabs  (generated from @UI.facet array) -->
+  <div class="card">
+    <div class="section-tabs">
+      <!-- facet id='RunHeader', type=#IDENTIFICATION_REFERENCE, position=10 -->
+      <div class="section-tab active" onclick="switchFacet(this,'facet-details')">Run Details</div>
+      <!-- facet id='Results', type=#LINEITEM_REFERENCE, position=20 -->
+      <div class="section-tab" onclick="switchFacet(this,'facet-results')">Processing Results <span style="background:#e0e7ff;color:#3451b2;border-radius:10px;padding:1px 8px;font-size:11px;font-weight:700;margin-left:4px">150</span></div>
+    </div>
+
+    <!-- ── FACET 1 : Run Details (#IDENTIFICATION_REFERENCE)
+         Fields from @UI.identification in ZC_SC_UPLOAD_RUN_NHL.ddlx ── -->
+    <div id="facet-details" class="facet-pane">
+      <div class="form-grid">
+        <!-- pos 10 -->
+        <div class="form-field">
+          <div class="form-label">Upload Time</div>
+          <div class="form-value">21 May 2025, 09:14:32</div>
+        </div>
+        <!-- pos 20 -->
+        <div class="form-field">
+          <div class="form-label">File Name</div>
+          <div class="form-value">SC_Contracts_Batch_May2025.xlsx</div>
+        </div>
+        <!-- pos 30 -->
+        <div class="form-field">
+          <div class="form-label">Uploaded By</div>
+          <div class="form-value">RRAVI (Rishikesh Ravi)</div>
+        </div>
+        <!-- pos 40 -->
+        <div class="form-field">
+          <div class="form-label">Total Records</div>
+          <div class="form-value">150</div>
+        </div>
+        <!-- pos 50 -->
+        <div class="form-field">
+          <div class="form-label">Success Count</div>
+          <div class="form-value" style="color:var(--green);font-weight:600">143</div>
+        </div>
+        <!-- pos 60 -->
+        <div class="form-field">
+          <div class="form-label">Failed Count</div>
+          <div class="form-value" style="color:var(--red);font-weight:600">7</div>
+        </div>
+        <!-- pos 70  ← StatusCriticality drives icon -->
+        <div class="form-field">
+          <div class="form-label">Status</div>
+          <div class="form-value">
+            <span class="badge badge-green"><span class="dot dot-green"></span> COMPLETED</span>
+          </div>
+        </div>
+        <!-- pos 80 — BAL Log Handle (identification only, not in lineItem) -->
+        <div class="form-field">
+          <div class="form-label">BAL Log Handle</div>
+          <div class="form-value link">Z_BO_SCUP_NHL / 550e8400</div>
+        </div>
+        <div class="form-field">
+          <div class="form-label">File Size</div>
+          <div class="form-value">4,194,304 bytes (4.2 MB)</div>
+        </div>
+        <div class="form-field">
+          <div class="form-label">File Hash (SHA-1)</div>
+          <div class="form-value" style="font-size:11px;font-family:monospace">da39a3ee5e6b4b0d3255bfef95601890afd80709</div>
+        </div>
+        <div class="form-field">
+          <div class="form-label">Created By</div>
+          <div class="form-value">RRAVI</div>
+        </div>
+        <div class="form-field">
+          <div class="form-label">Created At</div>
+          <div class="form-value">21 May 2025, 09:14:30</div>
+        </div>
+        <div class="form-field">
+          <div class="form-label">Last Changed By</div>
+          <div class="form-value">RRAVI</div>
+        </div>
+        <div class="form-field">
+          <div class="form-label">Last Changed At</div>
+          <div class="form-value">21 May 2025, 09:15:44</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── FACET 2 : Processing Results (#LINEITEM_REFERENCE → ZC_SC_UPLOAD_RES_NHL)
+         Columns from @UI.lineItem in ZC_SC_UPLOAD_RES_NHL.ddlx ── -->
+    <div id="facet-results" class="facet-pane" style="display:none">
+      <div class="card-header" style="border-top:1px solid var(--border);border-radius:0">
+        <div>
+          <span class="card-title">Processing Results</span>
+          <span class="card-count">(150 rows)</span>
+        </div>
+        <div style="display:flex;gap:8px">
+          <input class="search-input" type="text" placeholder="Search results…" style="width:180px"/>
+          <button class="btn btn-default btn-sm">⬇ Export</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <!-- @UI.lineItem positions from ZC_SC_UPLOAD_RES_NHL.ddlx -->
+              <th>Seq# <span class="sort-icon">▼</span></th>     <!-- pos 10 -->
+              <th>Contract Ref <span class="sort-icon">⇅</span></th><!-- pos 20 -->
+              <th>Action <span class="sort-icon">⇅</span></th>      <!-- pos 30 -->
+              <th>Contract No <span class="sort-icon">⇅</span></th> <!-- pos 40 -->
+              <!-- pos 50 — criticality: 'ResultCriticality', #WITH_ICON -->
+              <th>Status <span class="sort-icon">⇅</span></th>
+              <th>HTTP <span class="sort-icon">⇅</span></th>         <!-- pos 60 -->
+              <th>Error Code <span class="sort-icon">⇅</span></th>   <!-- pos 70 -->
+              <th>Error Message <span class="sort-icon">⇅</span></th><!-- pos 80 -->
+              <th>Error Target <span class="sort-icon">⇅</span></th> <!-- pos 90 -->
+              <th>Processed At <span class="sort-icon">⇅</span></th> <!-- pos 100 -->
+              <th>Sheet <span class="sort-icon">⇅</span></th>        <!-- pos 110 -->
+              <th>Row <span class="sort-icon">⇅</span></th>          <!-- pos 120 -->
+            </tr>
+          </thead>
+          <tbody id="result-body">
+            <!-- injected by JS -->
+          </tbody>
+        </table>
+      </div>
+      <div class="table-footer">
+        <span>Showing 1–10 of 150</span>
+        <div class="pagination">
+          <button class="pg-btn">‹</button>
+          <button class="pg-btn active">1</button>
+          <button class="pg-btn">2</button>
+          <button class="pg-btn">3</button>
+          <button class="pg-btn">⋯</button>
+          <button class="pg-btn">15</button>
+          <button class="pg-btn">›</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /card -->
+</div><!-- /page-obj -->
+
+
+<!-- ════════════════════════════════════════════
+     UPLOAD EXCEL MODAL
+     Triggered by the action button.
+     Parameter structure: ZS_SC_UPLOAD_EXCEL_PRM_NHL
+       → FileName  (mandatory field in BDEF)
+       → FileContent (xstring — the binary)
+═══════════════════════════════════════════════ -->
+<div class="modal-overlay" id="upload-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">⬆ Upload Excel — New Run</span>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="input-group">
+        <!-- FileName field — BDEF: field(mandatory) FileName -->
+        <label class="input-label">File Name <span class="req">*</span></label>
+        <input class="input-field" id="modal-filename" type="text"
+               placeholder="e.g. SC_Contracts_Batch_June2025.xlsx"
+               oninput="syncFileName(this.value)"/>
+      </div>
+      <div class="input-group">
+        <label class="input-label">Excel File <span class="req">*</span>
+          <span style="font-weight:400;text-transform:none;letter-spacing:0;color:var(--text-secondary)">
+            (passed as FileContent xstring to uploadExcel action)</span>
+        </label>
+        <!-- Drop zone — represents FileContent parameter of ZS_SC_UPLOAD_EXCEL_PRM_NHL -->
+        <div class="upload-zone" id="drop-zone" onclick="document.getElementById('file-input').click()"
+             ondragover="event.preventDefault();this.style.borderColor='var(--accent)'"
+             ondragleave="this.style.borderColor='var(--border-strong)'">
+          <div class="uz-icon">📂</div>
+          <div class="uz-text">Click or drag &amp; drop your .xlsx file here</div>
+          <div class="uz-hint">Only Excel workbooks (.xlsx) are supported · Max 20 MB</div>
+        </div>
+        <input type="file" id="file-input" accept=".xlsx" style="display:none" onchange="fileSelected(this)"/>
+        <div id="file-attached" style="display:none;margin-top:8px" class="file-attached">
+          <span>📄</span>
+          <span id="attached-name">—</span>
+          <span id="attached-size" style="margin-left:auto;font-size:11px;color:var(--text-secondary)"></span>
+        </div>
+      </div>
+
+      <!-- Simulated progress bar (shown after submit) -->
+      <div id="progress-wrap" style="display:none">
+        <div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px">
+          Processing… status set to <strong>RUNNING</strong> by uploadExcel action
+        </div>
+        <div class="progress-bar"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-default" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" id="submit-btn" onclick="simulateUpload()">⬆ Upload &amp; Process</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast notification -->
+<div class="toast success" id="toast">
+  <span>✅</span>
+  <span id="toast-msg">Upload complete — 143 success, 7 failed</span>
+</div>
+
+
+<script>
+/* ═══════════ Sample data ═══════════════════════════════════════════════
+   Represents rows from ZSC_UPLOAD_RUN_NHL read via ZC_SC_UPLOAD_RUN_NHL
+════════════════════════════════════════════════════════════════════════*/
+const runs = [
+  { ts:'21 May 2025 09:14', file:'SC_Contracts_Batch_May2025.xlsx', by:'RRAVI', total:150, ok:143, fail:7,  status:'COMPLETED' },
+  { ts:'20 May 2025 14:22', file:'SC_Contracts_Apr2025.xlsx',       by:'JSMITH',total:89,  ok:89,  fail:0,  status:'COMPLETED' },
+  { ts:'19 May 2025 11:07', file:'SC_Q2_Renewals.xlsx',             by:'AMULLER',total:200,ok:187, fail:13, status:'COMPLETED' },
+  { ts:'18 May 2025 16:45', file:'SC_Urgent_New.xlsx',              by:'RRAVI', total:12,  ok:0,   fail:12, status:'FAILED'    },
+  { ts:'17 May 2025 08:30', file:'SC_Amendments_W20.xlsx',          by:'LWANG',  total:55,  ok:55,  fail:0,  status:'COMPLETED' },
+  { ts:'16 May 2025 13:55', file:'SC_Partner_Updates.xlsx',         by:'JSMITH', total:30,  ok:28,  fail:2,  status:'COMPLETED' },
+  { ts:'15 May 2025 10:10', file:'SC_Backdated_May.xlsx',           by:'AMULLER',total:66,  ok:0,   fail:66, status:'FAILED'    },
+  { ts:'21 May 2025 09:55', file:'SC_Live_Import.xlsx',             by:'RRAVI', total:44,  ok:18,  fail:0,  status:'RUNNING'   },
+];
+
+/* Status → badge HTML
+   Driven by:  StatusCriticality CASE expression in ZC_SC_UPLOAD_RUN_NHL.ddls
+               criticality: 'StatusCriticality', criticalityRepresentation: #WITH_ICON
+   3 = green (COMPLETED), 2 = orange (RUNNING), 1 = red (FAILED), 0 = grey */
+function statusBadge(s) {
+  const map = {
+    COMPLETED: `<span class="badge badge-green"><span class="icon-crit">✅</span> COMPLETED</span>`,
+    FAILED:    `<span class="badge badge-red"><span class="icon-crit">❌</span> FAILED</span>`,
+    RUNNING:   `<span class="badge badge-orange"><span class="icon-crit">⏳</span> RUNNING</span>`,
+  };
+  return map[s] || `<span class="badge badge-grey">${s}</span>`;
+}
+
+/* Render List Report table */
+function renderList() {
+  const tbody = document.getElementById('list-body');
+  tbody.innerHTML = runs.map(r => `
+    <tr onclick="showPage('obj')" style="cursor:pointer">
+      <td><input type="checkbox" onclick="event.stopPropagation()"/></td>
+      <td>${r.ts}</td>
+      <td class="link">${r.file}</td>
+      <td>${r.by}</td>
+      <td>${r.total}</td>
+      <td style="color:var(--green);font-weight:600">${r.ok}</td>
+      <td style="color:${r.fail>0?'var(--red)':'var(--green)'};font-weight:600">${r.fail}</td>
+      <td>${statusBadge(r.status)}</td>
+    </tr>`).join('');
+}
+
+/* ═══════════ Sample result rows ════════════════════════════════════════
+   Represents ZSC_UPLOAD_RES_NHL child rows for one run
+   Columns from @UI.lineItem in ZC_SC_UPLOAD_RES_NHL.ddlx
+════════════════════════════════════════════════════════════════════════*/
+const results = [
+  { seq:1,  ref:'REF-0001', action:'CREATE', sc:'SC-100234', status:'SUCCESS', http:201, ecode:'',        emsg:'',                                etgt:'',             at:'09:15:01', sheet:'Header', row:2  },
+  { seq:2,  ref:'REF-0002', action:'UPDATE', sc:'SC-100189', status:'SUCCESS', http:200, ecode:'',        emsg:'',                                etgt:'',             at:'09:15:03', sheet:'Header', row:3  },
+  { seq:3,  ref:'REF-0003', action:'CREATE', sc:'',          status:'ERROR',   http:400, ecode:'SCUP_030',emsg:'Orphan item row — no header match',etgt:'item.row[5]',  at:'09:15:06', sheet:'Header', row:4  },
+  { seq:4,  ref:'REF-0004', action:'CREATE', sc:'SC-100235', status:'SUCCESS', http:201, ecode:'',        emsg:'',                                etgt:'',             at:'09:15:08', sheet:'Header', row:5  },
+  { seq:5,  ref:'REF-0005', action:'UPDATE', sc:'',          status:'ERROR',   http:422, ecode:'SCUP_100',emsg:'BP 0000001234 not found in system',etgt:'SoldToParty',  at:'09:15:11', sheet:'Header', row:6  },
+  { seq:6,  ref:'REF-0006', action:'CREATE', sc:'SC-100236', status:'SUCCESS', http:201, ecode:'',        emsg:'',                                etgt:'',             at:'09:15:14', sheet:'Header', row:7  },
+  { seq:7,  ref:'REF-0007', action:'CREATE', sc:'SC-100237', status:'SUCCESS', http:201, ecode:'',        emsg:'',                                etgt:'',             at:'09:15:16', sheet:'Header', row:8  },
+  { seq:8,  ref:'REF-0008', action:'UPDATE', sc:'',          status:'ERROR',   http:400, ecode:'SCUP_020',emsg:'Invalid date format: 32/13/2025', etgt:'ValidFrom',    at:'09:15:19', sheet:'Header', row:9  },
+  { seq:9,  ref:'REF-0009', action:'CREATE', sc:'SC-100238', status:'SUCCESS', http:201, ecode:'',        emsg:'',                                etgt:'',             at:'09:15:22', sheet:'Header', row:10 },
+  { seq:10, ref:'REF-0010', action:'CREATE', sc:'SC-100239', status:'SUCCESS', http:201, ecode:'',        emsg:'',                                etgt:'',             at:'09:15:24', sheet:'Header', row:11 },
+];
+
+function resultBadge(s) {
+  /* ResultCriticality CASE in ZC_SC_UPLOAD_RES_NHL.ddls
+     3=green(SUCCESS) 2=orange(WARNING) 1=red(ERROR) 0=grey */
+  const map = {
+    SUCCESS: `<span class="badge badge-green"><span class="icon-crit">✅</span> SUCCESS</span>`,
+    ERROR:   `<span class="badge badge-red"><span class="icon-crit">❌</span> ERROR</span>`,
+    WARNING: `<span class="badge badge-orange"><span class="icon-crit">⚠</span> WARNING</span>`,
+  };
+  return map[s] || `<span class="badge badge-grey">${s}</span>`;
+}
+
+function renderResults() {
+  const tbody = document.getElementById('result-body');
+  tbody.innerHTML = results.map(r => `
+    <tr>
+      <td>${r.seq}</td>
+      <td>${r.ref}</td>
+      <td><span style="background:${r.action==='CREATE'?'#e3f2fd':'#f3e5f5'};color:${r.action==='CREATE'?'#1565c0':'#7b1fa2'};padding:2px 8px;border-radius:10px;font-size:11px;font-weight:700">${r.action}</span></td>
+      <td style="color:var(--accent)">${r.sc || '—'}</td>
+      <td>${resultBadge(r.status)}</td>
+      <td><span style="background:${r.http>=200&&r.http<300?'var(--green-bg)':'var(--red-bg)'};color:${r.http>=200&&r.http<300?'var(--green)':'var(--red)'};padding:2px 8px;border-radius:4px;font-size:12px;font-weight:600;font-family:monospace">${r.http}</span></td>
+      <td style="font-size:12px;font-family:monospace;color:var(--red)">${r.ecode||'—'}</td>
+      <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;font-size:12px;color:var(--text-secondary)">${r.emsg||'—'}</td>
+      <td style="font-size:12px;font-family:monospace;color:var(--text-secondary)">${r.etgt||'—'}</td>
+      <td style="font-size:12px;color:var(--text-secondary)">${r.at}</td>
+      <td>${r.sheet}</td>
+      <td>${r.row}</td>
+    </tr>`).join('');
+}
+
+/* ═══════════ Navigation ════════════════════════════════════════════════*/
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+}
+
+function switchFacet(tab, paneId) {
+  document.querySelectorAll('.section-tab').forEach(t => t.classList.remove('active'));
+  tab.classList.add('active');
+  document.querySelectorAll('.facet-pane').forEach(p => p.style.display = 'none');
+  document.getElementById(paneId).style.display = '';
+}
+
+/* ═══════════ Upload Modal ══════════════════════════════════════════════*/
+function openUploadModal() {
+  document.getElementById('upload-modal').classList.add('open');
+  document.getElementById('progress-wrap').style.display = 'none';
+  document.getElementById('file-attached').style.display = 'none';
+  document.getElementById('modal-filename').value = '';
+  document.getElementById('submit-btn').disabled = false;
+  document.getElementById('submit-btn').textContent = '⬆ Upload & Process';
+}
+function closeModal() {
+  document.getElementById('upload-modal').classList.remove('open');
+}
+
+function syncFileName(v) {
+  document.getElementById('attached-name').textContent = v || '—';
+}
+
+function fileSelected(inp) {
+  const f = inp.files[0];
+  if (!f) return;
+  const name = f.name;
+  const size = (f.size / 1048576).toFixed(1) + ' MB';
+  document.getElementById('attached-name').textContent = name;
+  document.getElementById('attached-size').textContent = size;
+  document.getElementById('file-attached').style.display = 'flex';
+  document.getElementById('drop-zone').style.display = 'none';
+  if (!document.getElementById('modal-filename').value)
+    document.getElementById('modal-filename').value = name;
+}
+
+function simulateUpload() {
+  const fname = document.getElementById('modal-filename').value.trim();
+  if (!fname) {
+    document.getElementById('modal-filename').focus();
+    document.getElementById('modal-filename').style.borderColor = 'var(--red)';
+    return;
+  }
+  document.getElementById('modal-filename').style.borderColor = '';
+  /* Simulate RUNNING → COMPLETED sequence */
+  document.getElementById('submit-btn').disabled = true;
+  document.getElementById('submit-btn').textContent = '⏳ Processing…';
+  document.getElementById('progress-wrap').style.display = 'block';
+  let w = 0;
+  const iv = setInterval(() => {
+    w += Math.random() * 18;
+    if (w > 100) w = 100;
+    document.getElementById('prog-fill').style.width = w + '%';
+    if (w >= 100) {
+      clearInterval(iv);
+      setTimeout(() => {
+        closeModal();
+        showToast('✅ Upload complete — 143 success, 7 failed', 'success');
+        /* Add new row to top of list */
+        const now = new Date();
+        runs.unshift({ ts: now.toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) + ' ' + now.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}), file: fname, by:'RRAVI', total:150, ok:143, fail:7, status:'COMPLETED' });
+        renderList();
+      }, 400);
+    }
+  }, 120);
+}
+
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  t.className = 'toast ' + type + ' show';
+  setTimeout(() => { t.classList.remove('show'); }, 4000);
+}
+
+/* ═══════════ Init ══════════════════════════════════════════════════════*/
+renderList();
+renderResults();
+</script>
+</body>
+</html>
