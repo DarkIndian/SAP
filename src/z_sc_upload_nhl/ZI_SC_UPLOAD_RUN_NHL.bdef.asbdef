@@ -1,0 +1,84 @@
+managed with additional save;
+strict ( 2 );
+with draft;
+
+define behavior for ZI_SC_UPLOAD_RUN_NHL alias UploadRun
+persistent table zsc_upload_run_nhl
+draft table zsc_upload_drft_nhl
+lock master
+total etag LastChangedAt
+authorization master ( instance )
+etag master LastChangedAt
+{
+  field ( readonly, numbering : managed ) UploadRunUuid;
+  field ( readonly ) OverallStatus, SuccessCount, FailedCount, TotalRecords,
+                     BaliLogHandle, UploadTimestamp, FileHash, UploadedBy,
+                     CreatedBy, CreatedAt, LastChangedBy, LastChangedAt;
+  field ( mandatory ) FileName;
+
+  create;
+  delete;
+
+  action ( features : instance ) uploadExcel
+    parameter ZS_SC_UPLOAD_EXCEL_PRM_NHL
+    result [1] $self;
+
+  action ( features : instance ) reprocessFailed
+    result [1] $self;
+
+  draft action Edit;
+  draft action Activate optimized;
+  draft action Discard;
+  draft action Resume;
+  draft determine action Prepare;
+
+  association _Result { create; with draft; }
+
+  mapping for zsc_upload_run_nhl
+  {
+    UploadRunUuid   = upload_run_uuid;
+    UploadTimestamp = upload_timestamp;
+    UploadedBy      = uploaded_by;
+    FileName        = file_name;
+    FileSizeBytes   = file_size_bytes;
+    FileHash        = file_hash;
+    TotalRecords    = total_records;
+    SuccessCount    = success_count;
+    FailedCount     = failed_count;
+    OverallStatus   = overall_status;
+    BaliLogHandle   = bali_log_handle;
+    CreatedBy       = created_by;
+    CreatedAt       = created_at;
+    LastChangedBy   = last_changed_by;
+    LastChangedAt   = last_changed_at;
+  }
+}
+
+define behavior for ZI_SC_UPLOAD_RES_NHL alias UploadResult
+persistent table zsc_upload_res_nhl
+draft table zsc_upload_rdrft_nhl
+lock dependent by _Run
+total etag ProcessedAt
+authorization dependent by _Run
+{
+  field ( readonly ) all;
+
+  association _Run;
+
+  mapping for zsc_upload_res_nhl
+  {
+    UploadRunUuid   = upload_run_uuid;
+    ResultSeq       = result_seq;
+    SourceSheet     = source_sheet;
+    SourceRow       = source_row;
+    ContractRefId   = contract_ref_id;
+    Action          = action;
+    ServiceContract = service_contract;
+    HttpStatus      = http_status;
+    ResultStatus    = result_status;
+    ErrorCode       = error_code;
+    ErrorMessage    = error_message;
+    ErrorTarget     = error_target;
+    ProcessedAt     = processed_at;
+  }
+}

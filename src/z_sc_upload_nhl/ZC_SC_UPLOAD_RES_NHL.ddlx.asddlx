@@ -1,0 +1,44 @@
+@Metadata.layer: #CUSTOMER
+annotate view ZC_SC_UPLOAD_RES_NHL with
+{
+  @UI.lineItem: [{ position: 10, label: 'Seq#' }]
+  ResultSeq;
+
+  @UI.lineItem: [{ position: 20, label: 'Contract Ref' }]
+  ContractRefId;
+
+  @UI.lineItem: [{ position: 30, label: 'Action' }]
+  Action;
+
+  @UI.lineItem: [{ position: 40, label: 'Contract No' }]
+  ServiceContract;
+
+  @UI.lineItem: [{ position: 50, label: 'Status',
+                   criticality: 'ResultCriticality',
+                   criticalityRepresentation: #WITH_ICON }]
+  ResultStatus;
+
+  @UI.hidden: true
+  ResultCriticality;
+
+  @UI.lineItem: [{ position: 60, label: 'HTTP Status' }]
+  HttpStatus;
+
+  @UI.lineItem: [{ position: 70, label: 'Error Code' }]
+  ErrorCode;
+
+  @UI.lineItem: [{ position: 80, label: 'Error Message' }]
+  ErrorMessage;
+
+  @UI.lineItem: [{ position: 90, label: 'Error Target' }]
+  ErrorTarget;
+
+  @UI.lineItem: [{ position: 100, label: 'Processed At' }]
+  ProcessedAt;
+
+  @UI.lineItem: [{ position: 110, label: 'Source Sheet' }]
+  SourceSheet;
+
+  @UI.lineItem: [{ position: 120, label: 'Source Row' }]
+  SourceRow;
+}

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_SRVB" serializer_version="v1.0.0">
+  <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+    <asx:values>
+      <SRVB>
+        <SRVD_REF>ZSD_SC_UPLOAD_NHL</SRVD_REF>
+        <BINDING_TYPE>UI</BINDING_TYPE>
+        <PROTOCOL>ODATA_V4_UI</PROTOCOL>
+        <CATEGORY>0</CATEGORY>
+        <DDTEXT>SC Mass Upload - Service Binding (NHL)</DDTEXT>
+      </SRVB>
+    </asx:values>
+  </asx:abap>
+</abapGit>

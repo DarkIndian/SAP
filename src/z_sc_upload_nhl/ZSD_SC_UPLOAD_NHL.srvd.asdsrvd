@@ -1,0 +1,6 @@
+@EndUserText.label: 'SC Mass Upload - Service Definition (NHL)'
+define service ZSD_SC_UPLOAD_NHL {
+  expose ZC_SC_UPLOAD_RUN_NHL as UploadRun;
+  expose ZC_SC_UPLOAD_RES_NHL as UploadResult;
+  expose draft.DraftAdministrativeData;
+}
