@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_DTEL" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <DD04V>
+    <ROLLNAME>ZDE_SC_RUN_STATUS_NHL</ROLLNAME>
+    <DDLANGUAGE>E</DDLANGUAGE>
+    <DOMNAME>ZDE_SC_RUN_STATUS_NHL</DOMNAME>
+    <DATATYPE>CHAR</DATATYPE>
+    <LENG>0000010</LENG>
+    <DDTEXT>SC Upload Run Status</DDTEXT>
+    <REPTEXT>Run Status</REPTEXT>
+    <SCRTEXT_S>Status</SCRTEXT_S>
+    <SCRTEXT_M>Run Status</SCRTEXT_M>
+    <SCRTEXT_L>Upload Run Status</SCRTEXT_L>
+   </DD04V>
+  </asx:values>
+ </asx:abap>
+</abapGit>

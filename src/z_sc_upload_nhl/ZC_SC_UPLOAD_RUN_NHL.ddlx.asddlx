@@ -1,0 +1,63 @@
+@Metadata.layer: #CUSTOMER
+@UI.headerInfo:
+  { typeName: 'Upload Run',
+    typeNamePlural: 'Upload Runs',
+    title: { type: #STANDARD, value: 'FileName' },
+    description: { type: #STANDARD, value: 'OverallStatus' } }
+
+annotate view ZC_SC_UPLOAD_RUN_NHL with
+{
+  @UI.facet: [
+    { id:            'RunHeader',
+      purpose:       #STANDARD,
+      type:          #IDENTIFICATION_REFERENCE,
+      label:         'Run Details',
+      position:      10 },
+    { id:            'Results',
+      purpose:       #STANDARD,
+      type:          #LINEITEM_REFERENCE,
+      label:         'Processing Results',
+      position:      20,
+      targetElement: '_Result' }
+  ]
+
+  @UI.lineItem:       [{ position: 10, label: 'Upload Time' }]
+  @UI.identification: [{ position: 10 }]
+  UploadTimestamp;
+
+  @UI.lineItem:       [{ position: 20, label: 'File Name' }]
+  @UI.identification: [{ position: 20 }]
+  FileName;
+
+  @UI.lineItem:       [{ position: 30, label: 'Uploaded By' }]
+  @UI.identification: [{ position: 30 }]
+  UploadedBy;
+
+  @UI.lineItem:       [{ position: 40, label: 'Total' }]
+  @UI.identification: [{ position: 40 }]
+  TotalRecords;
+
+  @UI.lineItem:       [{ position: 50, label: 'Success' }]
+  @UI.identification: [{ position: 50 }]
+  SuccessCount;
+
+  @UI.lineItem:       [{ position: 60, label: 'Failed' }]
+  @UI.identification: [{ position: 60 }]
+  FailedCount;
+
+  @UI.lineItem:       [{ position: 70, label: 'Status',
+                         criticality: 'StatusCriticality',
+                         criticalityRepresentation: #WITH_ICON }]
+  @UI.identification: [{ position: 70 }]
+  OverallStatus;
+
+  @UI.hidden: true
+  StatusCriticality;
+
+  @UI.identification: [{ position: 80, label: 'BAL Log Handle' }]
+  BaliLogHandle;
+
+  @UI.lineItem:    [{ type: #FOR_ACTION, dataAction: 'uploadExcel',
+                      label: 'Upload Excel', position: 10 }]
+  UploadRunUuid;
+}

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_DOMA" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <DD01V>
+    <DOMNAME>ZDE_SC_ACTION_NHL</DOMNAME>
+    <DDLANGUAGE>E</DDLANGUAGE>
+    <DATATYPE>CHAR</DATATYPE>
+    <LENG>0000006</LENG>
+    <DDTEXT>SC Upload Action</DDTEXT>
+   </DD01V>
+   <DD07V_TABLE>
+    <DD07V>
+     <DOMNAME>ZDE_SC_ACTION_NHL</DOMNAME>
+     <VALPOS>0001</VALPOS>
+     <DOMVALUE_L>CREATE</DOMVALUE_L>
+     <DDLANGUAGE>E</DDLANGUAGE>
+     <DDTEXT>Create New Contract</DDTEXT>
+    </DD07V>
+    <DD07V>
+     <DOMNAME>ZDE_SC_ACTION_NHL</DOMNAME>
+     <VALPOS>0002</VALPOS>
+     <DOMVALUE_L>UPDATE</DOMVALUE_L>
+     <DDLANGUAGE>E</DDLANGUAGE>
+     <DDTEXT>Update Existing Contract</DDTEXT>
+    </DD07V>
+   </DD07V_TABLE>
+  </asx:values>
+ </asx:abap>
+</abapGit>

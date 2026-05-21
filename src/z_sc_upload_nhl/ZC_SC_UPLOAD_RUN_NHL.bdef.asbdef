@@ -1,0 +1,22 @@
+projection;
+strict ( 2 );
+use draft;
+
+define behavior for ZC_SC_UPLOAD_RUN_NHL alias UploadRun
+{
+  use create;
+  use delete;
+  use action uploadExcel;
+  use action reprocessFailed;
+  use draft action Edit;
+  use draft action Activate;
+  use draft action Discard;
+  use draft action Resume;
+  use draft action Prepare;
+  use association _Result { create; with draft; }
+}
+
+define behavior for ZC_SC_UPLOAD_RES_NHL alias UploadResult
+{
+  use association _Run;
+}

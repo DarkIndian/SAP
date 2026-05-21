@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<abapGit version="v1.0.0" serializer="LCL_OBJECT_STRU" serializer_version="v1.0.0">
+ <asx:abap xmlns:asx="http://www.sap.com/abapxml" version="1.0">
+  <asx:values>
+   <DD02V>
+    <TABNAME>ZS_SC_UPLOAD_EXCEL_PRM_NHL</TABNAME>
+    <DDLANGUAGE>E</DDLANGUAGE>
+    <TABCLASS>INTTAB</TABCLASS>
+    <DDTEXT>SC Upload Excel Action Parameter (NHL)</DDTEXT>
+    <MAINFLAG>X</MAINFLAG>
+   </DD02V>
+   <DD03P_TABLE>
+    <DD03P>
+     <TABNAME>ZS_SC_UPLOAD_EXCEL_PRM_NHL</TABNAME>
+     <FIELDNAME>FILE_CONTENT</FIELDNAME>
+     <DDLANGUAGE>E</DDLANGUAGE>
+     <POSITION>0001</POSITION>
+     <ADMINFIELD>0</ADMINFIELD>
+     <INTTYPE>y</INTTYPE>
+     <INTLEN>000008</INTLEN>
+     <DATATYPE>RSTR</DATATYPE>
+     <LENG>000000</LENG>
+     <DDTEXT>Excel File Binary Content</DDTEXT>
+    </DD03P>
+    <DD03P>
+     <TABNAME>ZS_SC_UPLOAD_EXCEL_PRM_NHL</TABNAME>
+     <FIELDNAME>FILE_NAME</FIELDNAME>
+     <DDLANGUAGE>E</DDLANGUAGE>
+     <POSITION>0002</POSITION>
+     <ADMINFIELD>0</ADMINFIELD>
+     <INTTYPE>g</INTTYPE>
+     <INTLEN>000008</INTLEN>
+     <DATATYPE>STRG</DATATYPE>
+     <LENG>000000</LENG>
+     <DDTEXT>Original File Name</DDTEXT>
+    </DD03P>
+   </DD03P_TABLE>
+  </asx:values>
+ </asx:abap>
+</abapGit>
